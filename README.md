@@ -4,10 +4,10 @@ To automate the process of sending a daily question to a particular mail list ba
 To automate the process of sending a daily question to a particular mail list based on the criteria you provided, you can use a programming language like Python. Here's a step-by-step guide on how you can achieve this:
 
 Steps:
-Choose a Programming Language:
 
-Python is a good choice for this task due to its simplicity and the availability of libraries like smtplib for sending emails, and pymysql for MySQL database interaction.
-Install Required Libraries:
+**Python is required 
+mySQL is required
+**Install Required Libraries:
 
 Install the required libraries using pip:
 bash
