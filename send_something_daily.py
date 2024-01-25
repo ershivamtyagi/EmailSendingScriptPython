@@ -3,11 +3,6 @@ import pymysql
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
-import logging
-
-# Set up logging
-log_file = f"email_log_{datetime.now().date()}.log"
-logging.basicConfig(filename=log_file, level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Database connection parameters
 db_host = "your_mysql_host"
@@ -24,7 +19,7 @@ current_date = datetime.now().date()
 
 # Query to fetch users and their questions based on the criteria
 query = """
-SELECT u.id, u.email, u.preferredLanguage, q.question, q.intuition, q.brute_force, q.complexitybf, q.better1, q.complexity_b, q.optimal, q.complexity_o
+SELECT u.id, u.email, u.preferredLanguage, q.day_id, q.question, q.intuition, q.brute_force, q.complexitybf, q.better1, q.complexity_b, q.optimal, q.complexity_o
 FROM user u
 JOIN daily_questions q ON DATEDIFF(%s, u.creationDate) = q.dayid
 """
@@ -46,10 +41,10 @@ email_password = "your_email_password"
 
 # Iterate through the results and send emails
 for row in results:
-    user_id, email, preferred_language, question, intuition, brute_force, complexitybf, better1, complexity_b, optimal, complexity_o = row
+    user_id, email, preferred_language, day_id, question, intuition, brute_force, complexitybf, better1, complexity_b, optimal, complexity_o = row
 
-    # Compose the email body based on user preferences with embedded CSS styles
-    subject = "Daily Question"
+    # Compose the email subject and body based on user preferences with embedded CSS styles
+    subject = f"Daily Question - Day {day_id}"
     username = email.split('@')[0]  # Extracting username from email address
 
     body = f"""
@@ -72,7 +67,7 @@ for row in results:
             </head>
             <body>
                 <p>Hello {username},</p>
-                <p class="question">Here is your daily question:</p>
+                <p class="question">Here is your daily question (Day {day_id}):</p>
                 <p>{question}</p>
     """
 
@@ -114,16 +109,9 @@ for row in results:
     message.attach(MIMEText(body, 'html'))
 
     # Connect to the SMTP server and send the email
-    try:
-        with smtplib.SMTP(email_host, email_port) as server:
-            server.starttls()
-            server.login(email_user, email_password)
-            server.sendmail(email_user, email, message.as_string())
-
-        # Log successful email sending
-        logging.info(f"Email sent successfully to {email}")
-    except Exception as e:
-        # Log any errors during email sending
-        logging.error(f"Error sending email to {email}: {str(e)}")
+    with smtplib.SMTP(email_host, email_port) as server:
+        server.starttls()
+        server.login(email_user, email_password)
+        server.sendmail(email_user, email, message.as_string())
 
 print("Emails sent successfully.")
